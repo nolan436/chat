@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Webhook Interface</title>
+    <title>Turbodrive Chat</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,6 +13,11 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
+        }
+        #chat-container, #name-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         #chat {
             width: 60%;
@@ -29,11 +34,29 @@
     </style>
 </head>
 <body>
-    <h1>Discord Webhook Chat</h1>
+    <div id="name-container">
+        <h2>Entrez votre nom</h2>
+        <input type="text" id="username" placeholder="Votre nom...">
+        <button onclick="setUsername()">Rejoindre</button>
+    </div><div id="chat-container" style="display: none;">
+    <h1>Turbodrive Chat</h1>
     <div id="chat"></div>
     <input type="text" id="message" placeholder="Écrivez un message...">
-    <button onclick="sendMessage()">Envoyer</button><script>
+    <button onclick="sendMessage()">Envoyer</button>
+</div>
+
+<script>
     const webhookURL = "https://discord.com/api/webhooks/1355219940415897889/TAcjlpplRj2Ixy048qREYAKGlhf4gdisLhi79Rh264ootizefrkAEOGsGn0a0-8xCxXR";
+    let username = "";
+    
+    function setUsername() {
+        const inputName = document.getElementById("username").value;
+        if (!inputName) return alert("Veuillez entrer un nom");
+        
+        username = inputName;
+        document.getElementById("name-container").style.display = "none";
+        document.getElementById("chat-container").style.display = "flex";
+    }
     
     function sendMessage() {
         const message = document.getElementById("message").value;
@@ -42,11 +65,11 @@
         fetch(webhookURL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ content: message })
+            body: JSON.stringify({ content: `**${username}**: ${message}` })
         }).then(response => {
             if (response.ok) {
                 document.getElementById("message").value = "";
-                addMessage("Vous", message);
+                addMessage(username, message);
             } else {
                 alert("Erreur lors de l'envoi du message");
             }
